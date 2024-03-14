@@ -148,7 +148,7 @@ rt_comm |>
 
 Based off of these tables, it is clear that the Facebook posts with the highest engagement, irregardless of type (video, text, link, photos, etc.), are posts that are only mostly true, defined in the dataset as "based on factual information and portray it accurately. T**his lets them interpret the event/info in their own way,** so long as they do not misrepresent events, numbers, quotes, reactions, etc., or make information up. This rating does not allow for unsupported speculation or claims" (Risdal 2017). However, interpretation of events and even wording can also lead to very skewed perspectives of current events, especially in a political context where 6/9 Facebook accounts that are being analyzed are trying to persuade readers to believe their political beliefs. Also, this certainly does not diminish the fact that mostly false/partially false posts gain a lot of traction and have a lot of engagement.
 
-## Factoring for Type of Post Bar Plot 
+## Factoring for Type of Post Bar Plot
 
 ```{r}
 #| label: post type engagement and truth
@@ -176,7 +176,7 @@ pt_engage_truth |>
 
 Even when factoring for post types, the same patterns emerge: most published posts are either mostly true or have no factual content (opinion pieces), as indicated by the prevalence of each truth rankings in each post type. You could also make the argument that opinion pieces do not have any factual grounding since they are not meant to inform but to convince, making fake news the largest type of news being shared on Facebook.
 
-# Who is Sharing Fake News? 
+# Who is Sharing Fake News?
 
 # Exploring Fake News Subset
 
@@ -249,6 +249,12 @@ The core concepts/insights revealed in these visualization is that fake news sel
 
 Would be very interesting to redo this study, especially in today's political context and shifts in social media, and for a longer period of time (more than just 7 days). Also I think it is important to note that this dataset was curated by humans, so there might be some human error, and this was published right before an election where the previous president was a Democrat (Obama) so right-wing news outlets would have greater of an incentive to spread rumors and publish more.
 
+## Github Repo link
+
+[<https://github.com/hannahs-li/stat302-final](https://github.com/hannahs-li/stat302-final)
+
 # References
 
 Risdal, M. (2017). "Fact-Checking Facebook Politics Pages", Kaggle. <https://www.kaggle.com/datasets/mrisdal/fact-checking-facebook-politics-pages/data>
+
+## 

@@ -1,1 +1,4 @@
-# stat302-final
+# Overview 
+My project will be analyzing the circulation of political news on Facebook, a very informal media sharing platform. More specifically, I will analyze who is mostly sharing fake political news–political affiliation, organization, etc.—-and what news gets shared the most.
+
+My data revolves around the 2016 US Presidential Election and features 3 large hyperpartisan left-wing Facebook pages (The Other, Addicting Info, and Occupy Democrats), 3 large hyperpartisan right-wing Facebook pages (Eagle Rising, Right Wing News, and Freedom Daily), and 3 mainstream news outlets on Facebook (Politico, CNN, and ABC news). This dataset is from "Fact-Checking Facebook Politics Pages" published by Meg Risdal on Kaggle, and was later used for a BuzzfeedNews article, "Hyperpartisan Facebook Pages Are Publishing False And Misleading Information At An Alarming Rate".
