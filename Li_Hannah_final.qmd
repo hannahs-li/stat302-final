@@ -1,0 +1,254 @@
+---
+title: "No Facts, All Printer: Visualizing the Cirulation of Fake Political News on Facebook during the 2016 US Presidential Election" 
+subtitle: |
+  | Final Project 
+  | Data Visualization (STAT 302)
+author: "Hannah Li"
+date: today
+format: revealjs
+editor: visual
+---
+
+# Introduction
+
+My project will be analyzing the circulation of political news on Facebook, a very informal media sharing platform. More specifically, I will analyze who is mostly sharing fake political news--political affiliation, organization, etc.----and what news gets shared the most.
+
+## Data Overview
+
+My data revolves around the 2016 US Presidential Election and features 3 large hyperpartisan left-wing Facebook pages (The Other, Addicting Info, and Occupy Democrats), 3 large hyperpartisan right-wing Facebook pages (Eagle Rising, Right Wing News, and Freedom Daily), and 3 mainstream news outlets on Facebook (Politico, CNN, and ABC news). This dataset is from ["Fact-Checking Facebook Politics Pages"](https://www.kaggle.com/datasets/mrisdal/fact-checking-facebook-politics-pages/data) published by Meg Risdal on Kaggle, and was later used for a BuzzfeedNews article, ["Hyperpartisan Facebook Pages Are Publishing False And Misleading Information At An Alarming Rate"](https://www.buzzfeednews.com/article/craigsilverman/partisan-fb-pages-analysis).
+
+## Data Overview Con't
+
+Over the course of 7 days (Sept 19-23, Sept 26-27) in 2016, people fact-checked all posts published by these Facebook pages, totaling 2282 posts (hence 2822 observations). 1145 were from mainstream news pages, 666 from right-wing pages, and 471 from left-wing pages.This led to the creation of the following variables: - `category`: political affiliation of the page (mainstream, left, right) - `page`: name of the page - `rating`: how true or false the statements being made in the post were or if they (mostly true, mixture of true or false, mostly false, no factual content) - `post_type`: if the post was a video, text, link, or photo
+
+Furthermore, they analyzed engagement metrics on each post, seen in the following variables: - `share_count`: number of shares on each post - `reaction_count`: number of reactions (likes/hearts) on each post - `comment_count`: number of comments on each post
+
+## Modifications to Data Set
+
+They had NA for 0 for these metrics so I replaced the NA values with 0. They also originally had account_id, post_id, and post_url but I found these variables irrelevant to the data analysis so I got rid of them. They also did not specify what `debate` was so I also got rid of it as well. Added log10 to the three engagement metrics because of the hard right-skew these engagement metrics were.
+
+## Data Set in Question
+
+```{r}
+#| label: load library and data set 
+#| output-location: column
+
+# load packages 
+library(tidyverse)
+library(viridis)
+library(patchwork)
+library(kableExtra)
+
+# load data 
+fb_facts <- read_csv("data/facebook-fact-check.csv") |> 
+  janitor::clean_names() |> 
+  select(-c(account_id, post_id, post_url, debate)) |> 
+  glimpse() |> 
+  mutate(
+    category = factor(category, levels = c("mainstream", "left", "right")),
+    share_count = replace_na(share_count, 0),
+    reaction_count = replace_na(reaction_count, 0),
+    comment_count = replace_na(comment_count, 0),
+    share_count_log10 = log10(share_count + 1),
+    reaction_count_log10 = log10(reaction_count + 1),
+    comment_count_log10 = log10(comment_count + 1)
+  )
+
+# missingness check 
+skimr::skim_without_charts(fb_facts)
+```
+
+# What kind of truth has the highest engagement?
+
+## Number of shares
+
+```{r}
+#| label: news truth rating vs. share counts 
+
+# build dataset 
+rt_sc <- fb_facts |> 
+  select(rating, share_count_log10) |> 
+  group_by(rating) |> 
+  summarise(share_count_log10 = sum(share_count_log10))
+
+# build plot 
+rt_sc |> 
+  ggplot(aes(x = rating, y = share_count_log10, fill = factor(share_count_log10))) + 
+  geom_bar(stat = "identity") + 
+  theme_minimal() + 
+  scale_fill_brewer(
+    labels = c("mixture of true and false (669)", "mostly false (308)", "mostly true (3185)", "no factual content (664)")
+  ) + 
+  labs(
+    title = "Facebook Post Truth Rating vs. Amount of Reactions",
+    x = "Truth Rating",
+    y = "Number of Reactions (log10)",
+    fill = "Total Log10 Number of Reactions \n on Each Truthfulness Ranking"
+  ) + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+## Number of reactions
+
+```{r}
+#| label: news truth rating vs. reaction counts 
+
+# build dataset 
+rt_rxn <- fb_facts |> 
+  select(rating, reaction_count_log10) |> 
+  group_by(rating) |> 
+  summarise(reaction_count_log10 = sum(reaction_count_log10))
+
+# build plot 
+rt_rxn |> 
+  ggplot(aes(x = rating, y = reaction_count_log10, fill = factor(reaction_count_log10))) + 
+  geom_bar(stat = "identity") + 
+  theme_minimal() + 
+  scale_fill_brewer(
+    labels = c("mixture of true and false (770)", "mostly false (341)", "mostly true (4450)", "no factual content (865)")
+  ) + 
+  labs(
+    title = "Facebook Post Truth Rating vs. Amount of Reactions",
+    x = "Truth Rating",
+    y = "Number of Reactions (log10)",
+    fill = "Total Log10 Number of Reactions \n on Each Truthfulness Ranking"
+  ) + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+## Number of comments
+
+```{r}
+#| label: news truth rating vs. comment counts 
+
+# build dataset 
+rt_comm <- fb_facts |> 
+  select(rating, comment_count_log10) |> 
+  group_by(rating) |> 
+  summarise(comment_count_log10 = sum(comment_count_log10))
+
+# build plot 
+rt_comm |> 
+  ggplot(aes(x = rating, y = comment_count_log10, fill = factor(comment_count_log10))) + 
+  geom_bar(stat = "identity") + 
+  theme_minimal() + 
+  scale_fill_brewer(
+    labels = c("mixture of true and false (545)", "mostly false (240)", "mostly true (3406)", "no factual content (571)")
+  ) + 
+  labs(
+    title = "Facebook Post Truth Rating vs. Amount of Comments",
+    x = "Truth Rating",
+    y = "Number of Comments (log10)",
+    fill = "Total Log10 Number of Comments \n on Each Truthfulness Ranking"
+  ) + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+## Analysis
+
+Based off of these tables, it is clear that the Facebook posts with the highest engagement, irregardless of type (video, text, link, photos, etc.), are posts that are only mostly true, defined in the dataset as "based on factual information and portray it accurately. T**his lets them interpret the event/info in their own way,** so long as they do not misrepresent events, numbers, quotes, reactions, etc., or make information up. This rating does not allow for unsupported speculation or claims" (Risdal 2017). However, interpretation of events and even wording can also lead to very skewed perspectives of current events, especially in a political context where 6/9 Facebook accounts that are being analyzed are trying to persuade readers to believe their political beliefs. Also, this certainly does not diminish the fact that mostly false/partially false posts gain a lot of traction and have a lot of engagement.
+
+## Factoring for Type of Post Bar Plot 
+
+```{r}
+#| label: post type engagement and truth
+
+# build dataset 
+pt_engage_truth <- fb_facts |> 
+  select(post_type, rating, share_count) |> 
+  group_by(post_type, rating) |> 
+  summarise(share_count = sum(share_count,na.rm = TRUE))
+
+# build plot 
+pt_engage_truth |> 
+  ggplot(aes(x = post_type, y = share_count, fill = rating)) +
+  geom_bar(stat = "identity", color = "white") + 
+  theme_minimal() + 
+  labs(
+    title = "Engagement on Various Degrees of Truthful Posts Factoring Post Type",
+    x = "Number of Shares",
+    y = "Post Type",
+    fill = "Truthful Ranking"
+  ) 
+```
+
+## Analysis
+
+Even when factoring for post types, the same patterns emerge: most published posts are either mostly true or have no factual content (opinion pieces), as indicated by the prevalence of each truth rankings in each post type. You could also make the argument that opinion pieces do not have any factual grounding since they are not meant to inform but to convince, making fake news the largest type of news being shared on Facebook.
+
+# Who is Sharing Fake News? 
+
+# Exploring Fake News Subset
+
+```{r}
+#| label: who is sharing fake news? 
+
+# build dataset 
+fake_news_sharers <- fb_facts |> 
+  filter(rating == "mostly false") |> 
+  group_by(category) |> 
+  select(category, page, share_count) |> 
+  count(page) 
+
+# build table 
+fake_news_sharers |> 
+  kbl() |> 
+  kable_styling()
+```
+
+# Exploring Fake News Subset Analysis
+
+Based off the table, it is clear that no mainstream Facebook accounts are circulating fake news. In other words, only hyper-partisan right and left wing Facebook accounts are. But the right has far more fake news publications, totaling 82 news posts that are "mostly false", a 273% increase than the left's total of 22 "mostly false" posts.
+
+## Political affiliation and engaging "mostly false" posts posted on Facebook.
+
+After seeing this table, I decided to run a correlation matrix to determine if there is a correlation between political affiliation and engaging "mostly false" posts posted on Facebook.
+
+## Correlation Matrix
+
+```{r}
+#| label: political identity and fake news matrix 
+
+# build data set 
+tr_pa <- fb_facts |> 
+  mutate(engagement = (sum(share_count, na.rm = TRUE) + sum(reaction_count, na.rm = TRUE) + sum(comment_count, na.rm = TRUE))) |> 
+  select(category, page, rating, engagement, share_count, reaction_count, comment_count) %>% 
+  group_by(category, rating) |> 
+  summarise(
+    share_counts = sum(share_count, na.rm = TRUE),
+    reaction_counts = sum(reaction_count, na.rm = TRUE),
+    comment_counts = sum(comment_count, na.rm = TRUE),
+    engagement_counts = sum(engagement, na.rm = TRUE)
+    )
+  
+# build plot 
+tr_pa |> 
+  ggplot(aes(x = rating, y = category, fill = engagement_counts)) +
+  geom_tile(size = 1, color = "white") +
+  scale_fill_viridis() +
+  geom_text(aes(label = engagement_counts), color='white', size = 2) +
+  theme_minimal() + 
+  labs(
+    title = "Political Affiliation and \nFake News Engagement Matrix",
+    x = "Truthfulness Rating",
+    y = "Page",
+    fill = "Engagement Counts \n (# of reactions, comments, shares)"
+  ) + 
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1)
+  )
+```
+
+There is a slight correlation between political affiliation and engagement with fake news. Most readers regardless of political identity engage the most with mostly true posts; however, right-wing Facebook readers have a much higher engagement count with mostly false news (1.8 billion) compared to the left (492 million). That is almost 4 times (3.66) as much engagement with fake news.
+
+# Conclusion
+
+The core concepts/insights revealed in these visualization is that fake news sells and both the left- and right-wing publish a lot of fake news that their audience engages in. Both audiences and pages mostly engage and post "mostly true" posts, but also need to consider their interpretation and language (basically that "mostly true" posts are not neutral posts). After isolating "mostly false" posts, the right is 3.66 times as likely to engage with mostly fake news and right-wing hyperpartisan media is 3.73 times as likely to post fake news according to this research.
+
+## Next steps
+
+Would be very interesting to redo this study, especially in today's political context and shifts in social media, and for a longer period of time (more than just 7 days). Also I think it is important to note that this dataset was curated by humans, so there might be some human error, and this was published right before an election where the previous president was a Democrat (Obama) so right-wing news outlets would have greater of an incentive to spread rumors and publish more.
+
+# References
+
+Risdal, M. (2017). "Fact-Checking Facebook Politics Pages", Kaggle. <https://www.kaggle.com/datasets/mrisdal/fact-checking-facebook-politics-pages/data>

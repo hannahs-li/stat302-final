@@ -1,0 +1,44 @@
+---
+title: "Progress Memo"
+subtitle: |
+  | Final Project 
+  | Data Visualization (STAT 302)
+author: "Hannah Li"
+date: today
+format:
+  html:
+    toc: true
+    embed-resources: true
+editor_options: 
+  chunk_output_type: console
+---
+
+## Data source
+
+Kaggle, ["Fact-Checking Facebook Politics" dataset](https://www.kaggle.com/datasets/mrisdal/fact-checking-facebook-politics-pages)
+
+## Basic data description
+
+Dataset features characteristics of the Facebook accounts (account_id, political affiliation, page name if they are a mainstream media company, if the account is a perosnal or media account), their shared news, and engagement (share_count, reaction_count, comment_count) during the 2016 US presidential elections. 
+
+```{r}
+#| label: load library and data set 
+
+# load packages 
+library(tidyverse)
+
+# load data 
+fb_facts <- read_csv("data/facebook-fact-check.csv") |> 
+  janitor::clean_names() |> 
+  glimpse()
+```
+
+
+## Why this data
+
+I like politics and research has shown that fake news often circulates on social media and informal media spheres. I think it would be really interesting to see how media is circulated, and what kind circulates the furthest, especially in today's hyper-polarized political climate. 
+
+## Visualization plan
+
+Definitely a regression and corr plot to see the existence and strength of correlation between political affiliation and engagement.  
+
